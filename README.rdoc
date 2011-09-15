@@ -73,7 +73,7 @@ project names:
 
 and then call project by name:
 
-    $ hosts dev
+    $ hr dev
     dev-web-01.newco.com
     dev-web-02.newco.com
     dev-db-01.newco.com
