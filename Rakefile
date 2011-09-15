@@ -17,8 +17,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "host_range"
   gem.homepage = "http://github.com/rlister/host_range"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{Convert hostname range pattern into array of hostnames.}
+  gem.description = %Q{Allows specification of hostname ranges such as foo-[01-09].}
   gem.email = "rlister+gh@gmail.com"
   gem.authors = ["Richard Lister"]
   # dependencies defined in Gemfile

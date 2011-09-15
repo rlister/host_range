@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 source "http://rubygems.org"
 # Add dependencies required to use your gem here.
 # Example:
@@ -10,4 +11,5 @@ group :development do
   gem "bundler", "~> 1.0.0"
   gem "jeweler", "~> 1.6.4"
   gem "rcov", ">= 0"
+  require "./lib/host_range"
 end

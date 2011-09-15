@@ -1,0 +1,72 @@
+#!/usr/bin/env ruby
+## expand hostname patterns
+
+require 'yaml'
+require 'optparse'
+require 'host_range'
+
+options = {
+  :separator => nil,                                         # separates hostname in output
+  :grep      => false,                                       # grep hostnames for this regex
+  :config    => "#{ENV['HOME']}/.#{File.basename($0)}.yaml", # config file with host lists
+  :exec      => nil,                                         # command to exec on each hostname
+}
+
+OptionParser.new do |opt|
+  opt.banner = "Usage: #{$0} [-h] [-a] [-l] [-c cfg] [-g regex] [-x] [-s char] [patterns] [-e cmd {}]"
+  
+  opt.on("-a", "--all",            "List all hosts from config.") { |a| options[:all] = a }
+  opt.on("-c", "--config FILE",    "Config file to load.")        { |c| options[:config] = c }
+  opt.on("-g", "--grep PATTERN",   "Grep host list for regex.")   { |g| options[:grep] = Regexp.new(g) }
+  opt.on("-l", "--list",           "List projects from config.")  { |l| options[:list] = l }
+  opt.on("-s", "--separator CHAR", "Set separator for output.")   { |s| options[:separator] = s }
+  opt.on("-x", "--xargs",          "Output hosts on one line.")   { |x| options[:separator] = ' ' }
+  opt.on("-e", "--exec COMMAND",   "Exec COMMAND on each hostname; must be last arg.")  do |e| 
+    options[:exec] = ARGV.shift(ARGV.length).unshift(e).join(' ') # slurp up rest of ARGV as cmd to exec
+  end
+  opt.on_tail("-h", "--help", "Show this message.") do
+    puts opt
+    puts "Example patterns: host-[abc][01,03,08-12].domain.com"
+    exit
+  end
+
+end.parse!
+
+## load config file
+yaml = File.exists?(options[:config]) ? YAML.load_file(options[:config]) : {}
+
+## -l option: list projects
+if options[:list]
+  projects = yaml.keys.sort
+  puts(options[:separator] ? projects.join(options[:separator]) : projects)
+  exit
+end
+
+## -a option: list hosts for all projects
+if options[:all]
+  ARGV.replace yaml.keys
+end
+
+## args are either a key in config file, or a hostname pattern to expand
+patterns = ARGV.map { |arg| yaml[arg] ? yaml[arg] : arg }.flatten
+
+## convert each pattern to list of hosts
+hosts = patterns.map { |p| HostRange.parse(p) }.flatten
+
+## -g option
+hosts = hosts.grep(options[:grep]) if options[:grep]
+
+## -s or -x option
+hosts.replace [hosts.join(options[:separator])] if options[:separator]
+
+## -e option, loop hosts and run command
+if options[:exec]
+  hosts.each do |host| 
+    command = options[:exec].dup
+    command.sub!(/\{\}/, host) || command.insert(-1, " #{host}") # put hostname at {} or end
+    system command
+  end
+## default, just list hosts
+else
+  puts hosts
+end
