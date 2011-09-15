@@ -1,3 +1,9 @@
+## example config file for the host_range 'hr' command-line tool
+## install as ~/.hr.yaml
+##
+## list pre-defined host patterns for your various projects, then invoke them
+## by the given name, e.g.:
+##   hr web -e ssh root@{} service httpd restart
 web:
   - webfe-[ab][01-05].newco.com
   - webfe-c[20-23,27-29].newco.com
