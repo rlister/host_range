@@ -1,0 +1,7 @@
+web:
+  - webfe-[ab][01-05].newco.com
+  - webfe-c[20-23,27-29].newco.com
+db:
+  - db-[a1-b9].newco.com
+dev:
+  - dev-[web,db]-[01-09].newco.com
